@@ -23,7 +23,6 @@ export default class User extends BaseEntity {
     @Column()
     username!: string;
 
-    @Field()
     @Column()
     password!: string;
 

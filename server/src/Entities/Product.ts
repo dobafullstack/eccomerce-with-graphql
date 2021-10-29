@@ -1,12 +1,11 @@
-import { Field, ID, ObjectType } from "type-graphql";
-import { BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import Category from "./Category";
-
+import { Field, ID, ObjectType } from 'type-graphql';
+import { BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import Category from './Category';
 
 @ObjectType()
 @Entity()
-export default class Product extends BaseEntity{
-    @Field(_types => ID)
+export default class Product extends BaseEntity {
+    @Field((_types) => ID)
     @PrimaryGeneratedColumn()
     id!: number;
 
@@ -22,11 +21,14 @@ export default class Product extends BaseEntity{
     @Column()
     price: number;
 
-    @Field()
-    @Column()
-    description: string;
+    @Field({ nullable: true })
+    @Column({ nullable: true })
+    description?: string;
 
-    @Field(_types => Category)
-    @ManyToOne(() => Category, category => category.products)
+    @Column({nullable: true})
+    categoryId!: number;
+
+    @Field((_types) => Category)
+    @ManyToOne(() => Category, (category) => category.products)
     category: Category;
 }
