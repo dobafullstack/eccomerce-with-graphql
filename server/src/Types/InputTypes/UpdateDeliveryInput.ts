@@ -1,18 +1,12 @@
 import { Field, InputType } from 'type-graphql';
 
 @InputType()
-export default class RegisterInput {
+export default class UpdateDeliveryInput {
     @Field()
-    name!: string;
+    id!: number;
 
-    @Field()
-    username!: string;
-
-    @Field()
-    password!: string;
-
-    @Field()
-    email!: string;
+    @Field({ nullable: true })
+    name?: string;
 
     @Field({ nullable: true })
     phone?: string;

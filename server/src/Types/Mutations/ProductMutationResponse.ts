@@ -12,7 +12,4 @@ export default class ProductMutationResponse implements MutationResponse {
 
     @Field((_return) => Product, { nullable: true })
     product?: Product;
-
-    @Field((_return) => [Product])
-    products?: Product[];
 }

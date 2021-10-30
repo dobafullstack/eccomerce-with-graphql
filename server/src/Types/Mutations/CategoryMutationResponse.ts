@@ -13,7 +13,4 @@ export default class CategoryMutationResponse implements MutationResponse{
 
     @Field(_return => Category, {nullable: true})
     category?: Category;
-
-    @Field(_return => [Category])
-    categories?: Category[];
 }
