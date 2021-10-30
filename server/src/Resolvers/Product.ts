@@ -1,19 +1,22 @@
-import { Arg, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
+import { Arg, FieldResolver, Mutation, Query, Resolver, Root, UseMiddleware } from 'type-graphql';
 import Logger from '../Configs/Logger';
 import Product from '../Entities/Product';
-import CreateProductInput from '../Types/CreateProductInput';
-import ProductMutationResponse from '../Types/ProductMutationResponse';
+import CreateProductInput from '../Types/InputTypes/CreateProductInput';
+import ProductMutationResponse from '../Types/Mutations/ProductMutationResponse';
 import _ from 'lodash';
-import UpdateProductInput from '../Types/UpdateProductInput';
+import UpdateProductInput from '../Types/InputTypes/UpdateProductInput';
 import Category from '../Entities/Category';
+import { Authentication } from '../Middlewares/Auth.middleware';
 
-@Resolver(_of => Product)
+@Resolver((_of) => Product)
 export default class ProductResolver {
-    @FieldResolver(_return => Category)
-    async category(@Root() root: Product){
-        return await Category.findOne(root.categoryId)
+    @FieldResolver((_return) => Category)
+    async category(@Root() root: Product) {
+        return await Category.findOne(root.categoryId);
     }
 
+    //Create product
+    @UseMiddleware(Authentication)
     @Mutation((_return) => ProductMutationResponse)
     async createProduct(
         @Arg('createProductInput') createProductInput: CreateProductInput
@@ -75,6 +78,7 @@ export default class ProductResolver {
     }
 
     //Update product
+    @UseMiddleware(Authentication)
     @Mutation((_return) => ProductMutationResponse)
     async updateProduct(
         @Arg('updateCategoryInput') updateProductInput: UpdateProductInput
@@ -92,7 +96,7 @@ export default class ProductResolver {
             }
 
             _.extend(existingProduct, {
-                ...updateProductInput
+                ...updateProductInput,
             });
 
             await existingProduct.save();
@@ -113,6 +117,8 @@ export default class ProductResolver {
         }
     }
 
+    //Delete Product
+    @UseMiddleware(Authentication)
     @Mutation((_return) => ProductMutationResponse)
     async deleteProduct(@Arg('id') id: number): Promise<ProductMutationResponse> {
         try {

@@ -1,13 +1,23 @@
-import { Arg, Mutation, Query, Resolver } from 'type-graphql';
+import { Arg, FieldResolver, Mutation, Query, Resolver, Root, UseMiddleware } from 'type-graphql';
 import Logger from '../Configs/Logger';
 import Category from '../Entities/Category';
-import CategoryMutationResponse from '../Types/CategoryMutationResponse';
+import CategoryMutationResponse from '../Types/Mutations/CategoryMutationResponse';
 import _ from 'lodash';
-import UpdateCategoryInput from '../Types/UpdateCategoryInput';
+import UpdateCategoryInput from '../Types/InputTypes/UpdateCategoryInput';
+import Product from '../Entities/Product';
+import { Authentication } from '../Middlewares/Auth.middleware';
 
-@Resolver()
+@Resolver((_of) => Category)
 export default class CategoryResolver {
+    @FieldResolver()
+    async products(@Root() root: Category): Promise<Product[]> {
+        const products = Product.find({ categoryId: root.id });
+
+        return products;
+    }
+
     //Create Category
+    @UseMiddleware(Authentication)
     @Mutation((_return) => CategoryMutationResponse)
     async createCategory(@Arg('name') name: string): Promise<CategoryMutationResponse> {
         try {
@@ -41,12 +51,12 @@ export default class CategoryResolver {
     }
 
     //Get list Categories
-    @Query((_return) => [Category], {nullable: true})
+    @Query((_return) => [Category], { nullable: true })
     async getCategories(): Promise<Category[] | null> {
         try {
             const categories = await Category.find();
 
-            return _.orderBy(categories, category => category.id);
+            return _.orderBy(categories, (category) => category.id);
         } catch (error: any) {
             Logger.error(error.message);
             return null;
@@ -54,7 +64,7 @@ export default class CategoryResolver {
     }
 
     //Get detail category
-    @Query((_return) => Category, {nullable: true})
+    @Query((_return) => Category, { nullable: true })
     async getCategory(@Arg('id') id: number): Promise<Category | null | undefined> {
         try {
             const category = await Category.findOne(id);
@@ -67,6 +77,7 @@ export default class CategoryResolver {
     }
 
     //Update category
+    @UseMiddleware(Authentication)
     @Mutation((_return) => CategoryMutationResponse)
     async updateCategory(
         @Arg('updateCategoryInput') updateCategoryInput: UpdateCategoryInput
@@ -105,10 +116,13 @@ export default class CategoryResolver {
         }
     }
 
+    //Delete Category
+    @UseMiddleware(Authentication)
     @Mutation((_return) => CategoryMutationResponse)
     async deleteCategory(@Arg('id') id: number): Promise<CategoryMutationResponse> {
         try {
             const existingCategory = await Category.findOne(id);
+            const products = await Product.find({ categoryId: id });
 
             if (!existingCategory) {
                 return {
@@ -118,6 +132,7 @@ export default class CategoryResolver {
                 };
             }
 
+            products.forEach(async (product) => await Product.delete(product));
             await Category.delete(existingCategory);
 
             return {

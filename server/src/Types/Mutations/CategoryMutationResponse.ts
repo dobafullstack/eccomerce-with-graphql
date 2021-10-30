@@ -1,7 +1,7 @@
 import { Field, ObjectType } from "type-graphql";
-import Category from "../Entities/Category";
-import FieldError from "./FieldError";
-import MutationResponse from "./MutationResponse";
+import Category from "../../Entities/Category";
+import FieldError from "../Interface/FieldError";
+import MutationResponse from "../Interface/MutationResponse";
 
 
 @ObjectType({implements: MutationResponse})

@@ -1,23 +1,16 @@
+import { COOKIES_NAME } from './../Constants/constant';
 import { Arg, Ctx, Mutation, Query, Resolver } from 'type-graphql';
 import Logger from '../Configs/Logger';
 import User from '../Entities/User';
-import RegisterInput from '../Types/RegisterInput';
-import UserMutationResponse from '../Types/UserMutationResponse';
+import RegisterInput from '../Types/InputTypes/RegisterInput';
+import UserMutationResponse from '../Types/Mutations/UserMutationResponse';
 import md5 from 'md5';
 import { ValidateRegister } from '../Utils/Validation';
-import LoginInput from '../Types/LoginInput';
+import LoginInput from '../Types/InputTypes/LoginInput';
 import { Context } from '../Types/Context';
 
 @Resolver()
 export default class Auth {
-    //Get User
-    @Query((_return) => User, { nullable: true })
-    async GetUser(@Ctx() { req }: Context): Promise<User | null | undefined> {
-        if (!req.session.userId) return null;
-
-        return await User.findOne({ id: req.session.userId });
-    }
-
     //Register
     @Mutation((_return) => UserMutationResponse)
     async Register(
@@ -115,5 +108,22 @@ export default class Auth {
                 message: `Interval server error ${error.message}`,
             };
         }
+    }
+
+    //Logout
+    @Mutation((_return) => Boolean)
+    async Logout(@Ctx() { req, res }: Context): Promise<Boolean> {
+        return new Promise((resolve, _reject) => {
+            res.clearCookie(COOKIES_NAME);
+
+            req.session.destroy((err) => {
+                if (err) {
+                    Logger.error(`DESTROYING SESSION ERROR ${err}`);
+                    resolve(false);
+                }
+
+                resolve(true);
+            });
+        });
     }
 }

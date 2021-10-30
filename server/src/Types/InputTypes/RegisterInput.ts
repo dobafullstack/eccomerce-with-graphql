@@ -15,8 +15,11 @@ export default class RegisterInput {
     email!: string;
 
     @Field()
-    phone: string;
+    roleId!: number;
 
-    @Field()
-    address: string;
+    @Field({ nullable: true })
+    phone?: string;
+
+    @Field({ nullable: true })
+    address?: string;
 }

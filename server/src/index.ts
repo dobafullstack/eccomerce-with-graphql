@@ -17,6 +17,14 @@ import mongoose from 'mongoose';
 import { Context } from './Types/Context';
 import CategoryResolver from './Resolvers/Category';
 import ProductResolver from './Resolvers/Product';
+import Role from './Entities/Role';
+import RoleResolver from './Resolvers/Role';
+import UserResolver from './Resolvers/User';
+import Order from './Entities/Order';
+import OrderDetail from './Entities/OrderDetail';
+import Delivery from './Entities/Delivery';
+import Bill from './Entities/Bill';
+import BillDetail from './Entities/BillDetail';
 
 const main = async () => {
     await createConnection({
@@ -26,26 +34,25 @@ const main = async () => {
         password: process.env.DB_PASSWORD,
         logging: true,
         synchronize: true,
-        entities: [User, Category, Product],
+        entities: [User, Category, Product, Role, Order, OrderDetail, Delivery, Bill, BillDetail],
     });
 
     const app = express();
     const PORT = process.env.PORT || 4000;
 
-    
     const apolloServer = new ApolloServer({
         schema: await buildSchema({
-            resolvers: [Auth, CategoryResolver, ProductResolver],
+            resolvers: [Auth, CategoryResolver, ProductResolver, RoleResolver, UserResolver],
         }),
         plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
         context: ({ req, res }): Context => ({ req, res }),
     });
-    
+
     //session
     const mongodb_url = process.env.MONGODB_URL as string;
     await mongoose.connect(mongodb_url);
 
-    Logger.success("MongoDB is connected");
+    Logger.success('MongoDB is connected');
 
     app.use(
         session({
@@ -55,14 +62,14 @@ const main = async () => {
                 maxAge: 1000 * 60, //one hour
                 httpOnly: true,
                 secure: __prod__,
-                sameSite: "lax",
+                sameSite: 'lax',
             },
             secret: process.env.SESSION_SECRET as string,
             saveUninitialized: false,
             resave: false,
         })
     );
-    
+
     await apolloServer.start();
 
     apolloServer.applyMiddleware({ app, cors: false });
