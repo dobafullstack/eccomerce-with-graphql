@@ -30,20 +30,44 @@ import OrderResolver from './Resolvers/Order';
 import OrderDetailResolver from './Resolvers/OrderDetail';
 import BillResolver from './Resolvers/Bill';
 import BillDetailResolver from './Resolvers/BillDetail';
+import path from 'path';
+import cors from 'cors'
 
 const main = async () => {
-    await createConnection({
+    const connection = await createConnection({
         type: 'postgres',
-        database: 'clothes_shop',
-        username: process.env.DB_USERNAME,
-        password: process.env.DB_PASSWORD,
+        ...(__prod__
+            ? { url: process.env.DATABASE_URL }
+            : {
+                  database: 'clothes_shop',
+                  username: process.env.DB_USERNAME,
+                  password: process.env.DB_PASSWORD,
+              }),
         logging: true,
-        synchronize: true,
+        ...(__prod__ ? {
+            extra: {
+                ssl: {
+                    rejectUnauthorized: false
+                }
+            },
+            ssl: true
+        }: {}),
+        ...(__prod__ ? {} : { synchronize: true }),
         entities: [User, Category, Product, Role, Order, OrderDetail, Delivery, Bill, BillDetail],
+        migrations: [path.join(__dirname, '/migrations/*')]
     });
+
+    if (__prod__) await connection.runMigrations()
 
     const app = express();
     const PORT = process.env.PORT || 4000;
+
+    // app.use(
+    //     cors({
+    //         origin: __prod__ ? '' : 'http://localhost:3000',
+    //         credentials: true
+    //     })
+    // )
 
     const apolloServer = new ApolloServer({
         schema: await buildSchema({
@@ -57,7 +81,7 @@ const main = async () => {
                 OrderResolver,
                 OrderDetailResolver,
                 BillResolver,
-                BillDetailResolver
+                BillDetailResolver,
             ],
         }),
         plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
@@ -75,10 +99,11 @@ const main = async () => {
             name: COOKIES_NAME,
             store: MongoStore.create({ mongoUrl: mongodb_url }),
             cookie: {
-                maxAge: 1000 * 60, //one hour
+                maxAge: 1000 * 60 * 5, //one hour
                 httpOnly: true,
                 secure: __prod__,
                 sameSite: 'lax',
+                domain: __prod__ ? '.vercel.app' : undefined
             },
             secret: process.env.SESSION_SECRET as string,
             saveUninitialized: false,

@@ -1,0 +1,10 @@
+{
+    "type": "postgres",
+    "host": "localhost",
+    "port": 5432,
+    "username": "your_username",
+    "password": "your_password",
+    "database": "clothes_shop_migrations",
+    "entities": ["build/entities/*.js"],
+    "migrations": ["build/migrations/*.js"]
+}
