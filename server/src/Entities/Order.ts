@@ -32,6 +32,10 @@ export default class Order extends BaseEntity {
     @OneToMany(() => OrderDetail, orderDetail => orderDetail.order)
     orderDetails: OrderDetail[]
 
+    @Column()
+    @Field()
+    status!: string;
+
     @Field()
     @CreateDateColumn()
     createdAt: Date;

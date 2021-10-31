@@ -17,6 +17,8 @@ import UpdateUserInput from '../Types/InputTypes/UpdateUserInput';
 import UserMutationResponse from '../Types/Mutations/UserMutationResponse';
 import _ from 'lodash';
 import Role from '../Entities/Role';
+import Delivery from '../Entities/Delivery';
+import Order from '../Entities/Order';
 
 @Resolver((_of) => User)
 export default class UserResolver {
@@ -26,6 +28,30 @@ export default class UserResolver {
             const role = await Role.findOne(root.roleId);
 
             return role;
+        } catch (error: any) {
+            Logger.error(error.message);
+            return null;
+        }
+    }
+
+    @FieldResolver()
+    async delivery(@Root() root: User): Promise<Order[] | null | undefined> {
+        try {
+            const orders = await Order.find({userId: root.id});
+
+            return orders;
+        } catch (error: any) {
+            Logger.error(error.message);
+            return null;
+        }
+    }
+
+    @FieldResolver()
+    async orders(@Root() root: User): Promise<Delivery[] | null | undefined> {
+        try {
+            const deliveries = await Delivery.find({userId: root.id});
+
+            return deliveries;
         } catch (error: any) {
             Logger.error(error.message);
             return null;

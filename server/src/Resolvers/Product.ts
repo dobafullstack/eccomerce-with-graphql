@@ -6,7 +6,7 @@ import ProductMutationResponse from '../Types/Mutations/ProductMutationResponse'
 import _ from 'lodash';
 import UpdateProductInput from '../Types/InputTypes/UpdateProductInput';
 import Category from '../Entities/Category';
-import { Authentication } from '../Middlewares/Auth.middleware';
+import { Authentication, Authorization } from '../Middlewares/Auth.middleware';
 
 @Resolver((_of) => Product)
 export default class ProductResolver {
@@ -17,6 +17,7 @@ export default class ProductResolver {
 
     //Create product
     @UseMiddleware(Authentication)
+    @UseMiddleware(Authorization)
     @Mutation((_return) => ProductMutationResponse)
     async createProduct(
         @Arg('createProductInput') createProductInput: CreateProductInput
@@ -79,6 +80,7 @@ export default class ProductResolver {
 
     //Update product
     @UseMiddleware(Authentication)
+    @UseMiddleware(Authorization)
     @Mutation((_return) => ProductMutationResponse)
     async updateProduct(
         @Arg('updateCategoryInput') updateProductInput: UpdateProductInput
@@ -119,6 +121,7 @@ export default class ProductResolver {
 
     //Delete Product
     @UseMiddleware(Authentication)
+    @UseMiddleware(Authorization)
     @Mutation((_return) => ProductMutationResponse)
     async deleteProduct(@Arg('id') id: number): Promise<ProductMutationResponse> {
         try {

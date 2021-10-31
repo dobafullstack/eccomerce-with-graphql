@@ -26,6 +26,10 @@ import Delivery from './Entities/Delivery';
 import Bill from './Entities/Bill';
 import BillDetail from './Entities/BillDetail';
 import DeliveryResolver from './Resolvers/Delivery';
+import OrderResolver from './Resolvers/Order';
+import OrderDetailResolver from './Resolvers/OrderDetail';
+import BillResolver from './Resolvers/Bill';
+import BillDetailResolver from './Resolvers/BillDetail';
 
 const main = async () => {
     await createConnection({
@@ -43,7 +47,18 @@ const main = async () => {
 
     const apolloServer = new ApolloServer({
         schema: await buildSchema({
-            resolvers: [Auth, CategoryResolver, ProductResolver, RoleResolver, UserResolver, DeliveryResolver],
+            resolvers: [
+                Auth,
+                CategoryResolver,
+                ProductResolver,
+                RoleResolver,
+                UserResolver,
+                DeliveryResolver,
+                OrderResolver,
+                OrderDetailResolver,
+                BillResolver,
+                BillDetailResolver
+            ],
         }),
         plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
         context: ({ req, res }): Context => ({ req, res }),

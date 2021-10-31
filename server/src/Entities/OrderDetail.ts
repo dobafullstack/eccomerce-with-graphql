@@ -28,7 +28,6 @@ export default class OrderDetail extends BaseEntity {
     @Column({ nullable: true })
     orderId!: number;
 
-    @Field((_return) => Order)
     @ManyToOne(() => Order, (order) => order.orderDetails)
     order: Order;
 

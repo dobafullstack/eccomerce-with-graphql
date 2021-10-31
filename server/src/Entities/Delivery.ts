@@ -35,11 +35,9 @@ export default class Delivery extends BaseEntity {
     userId!: number;
 
     @ManyToOne(() => User, (user) => user.delivery)
-    @Field((_return) => User)
     user: User;
 
     @OneToMany(() => Order, (order) => order.delivery)
-    @Field((_return) => [Order])
     orders: Order[];
 
     @Field()

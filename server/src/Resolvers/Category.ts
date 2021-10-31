@@ -5,7 +5,7 @@ import CategoryMutationResponse from '../Types/Mutations/CategoryMutationRespons
 import _ from 'lodash';
 import UpdateCategoryInput from '../Types/InputTypes/UpdateCategoryInput';
 import Product from '../Entities/Product';
-import { Authentication } from '../Middlewares/Auth.middleware';
+import { Authentication, Authorization } from '../Middlewares/Auth.middleware';
 
 @Resolver((_of) => Category)
 export default class CategoryResolver {
@@ -18,6 +18,7 @@ export default class CategoryResolver {
 
     //Create Category
     @UseMiddleware(Authentication)
+    @UseMiddleware(Authorization)
     @Mutation((_return) => CategoryMutationResponse)
     async createCategory(@Arg('name') name: string): Promise<CategoryMutationResponse> {
         try {
@@ -78,6 +79,7 @@ export default class CategoryResolver {
 
     //Update category
     @UseMiddleware(Authentication)
+    @UseMiddleware(Authorization)
     @Mutation((_return) => CategoryMutationResponse)
     async updateCategory(
         @Arg('updateCategoryInput') updateCategoryInput: UpdateCategoryInput
@@ -118,6 +120,7 @@ export default class CategoryResolver {
 
     //Delete Category
     @UseMiddleware(Authentication)
+    @UseMiddleware(Authorization)
     @Mutation((_return) => CategoryMutationResponse)
     async deleteCategory(@Arg('id') id: number): Promise<CategoryMutationResponse> {
         try {

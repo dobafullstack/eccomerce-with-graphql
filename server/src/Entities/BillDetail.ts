@@ -17,6 +17,9 @@ export default class BillDetail extends BaseEntity {
     @OneToMany(() => Product, (product) => product.billDetails)
     product: Product;
 
+    @Column()
+    billId!: number;
+
     @ManyToOne(() => Bill, bill => bill.billDetails)
     bill: Bill
 
